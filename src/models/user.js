@@ -48,6 +48,9 @@ addboat:{
     type: Boolean,
     default:true
 },
+avatar:{
+    type:Buffer
+},
 tokens: [{
     token : {
         type : String,
@@ -69,12 +72,13 @@ userSchema.virtual('equipements',{
 })
 
 
-// not showing the passeword and the tokens
+// not showing the passeword and the tokens and deleteing image to make it fast
 userSchema.methods.toJSON = function(){
     const user = this
     const userObject = user.toObject()
     delete userObject.password
     delete userObject.tokens
+    delete userObject.avatar
     return userObject
 
 }

@@ -1,1 +1,15 @@
 /Users/bil/mongodb\bin/mongod.exe --dbpath /Users/bil/mongodb-data
+
+
+
+C:\Users\bil\Desktop\medisail-dev>git push -u bileln main
+Enumerating objects: 43, done.
+Counting objects: 100% (43/43), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (40/40), done.
+Writing objects: 100% (43/43), 34.85 KiB | 759.00 KiB/s, done.
+Total 43 (delta 11), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (11/11), done.
+To github.com:benyoussefbilel/back-end-nodejs-mongodb-boat-manager.git
+ * [new branch]      main -> main
+Branch 'main' set up to track remote branch 'main' from 'bileln'.

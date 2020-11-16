@@ -4,11 +4,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "start": "node src/index.js",
+    "dev": "env-cmd -f ./config/dev.env nodemon src/index.js"
   },
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
@@ -17,8 +17,20 @@
     "mongoose": "^5.10.9",
     "mongoose-archive": "^1.1.0",
     "multer": "^1.4.2",
-    "nodemon": "^2.0.6",
     "sharp": "^0.26.2",
     "validator": "^13.1.17"
-  }
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0",
+    "nodemon": "^2.0.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benyoussefbilel/backend-nodejs-mongodb-boatmanager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/benyoussefbilel/backend-nodejs-mongodb-boatmanager/issues"
+  },
+  "homepage": "https://github.com/benyoussefbilel/backend-nodejs-mongodb-boatmanager#readme",
+  "description": ""
 }

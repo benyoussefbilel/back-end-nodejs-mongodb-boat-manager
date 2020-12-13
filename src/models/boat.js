@@ -49,6 +49,10 @@ const boatSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    status:{
+        type : String
+        
+     },
     sowner:{
         type : mongoose.Schema.Types.ObjectId,
         required : true,

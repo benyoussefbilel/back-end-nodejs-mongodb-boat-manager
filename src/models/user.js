@@ -6,11 +6,16 @@ const Boat = require('./boat')
 const Live = require('./live')
 
 const userSchema = new mongoose.Schema({
-name :{
+firstname :{
     type : String,
     required : true,
     trim : true
     },
+lastname :{
+        type : String,
+        required : true,
+        trim : true
+        },
 email:{
     type : String,
     required : true,
@@ -21,6 +26,12 @@ email:{
             throw new Error('email is invalid')
         }
     }
+},
+language:{
+    type : String
+},
+timeZone:{
+    type : String
 },
 password : {
     type : String,
@@ -49,7 +60,33 @@ addboat:{
     default:true
 },
 avatar:{
-    type:Buffer
+    type:String
+},
+isactive:{
+    type:Boolean,
+ default:true
+},
+phone:{
+    type : Number, 
+},
+companyName:{
+    type : String,
+    trim : true
+},
+adresseProvince:{
+    type : String,
+    trim : true
+},
+adresseCity:{
+    type : String,
+    trim : true
+},
+adresseCodePostal:{
+    type : Number,
+},
+adressePays:{
+    type : String,
+    trim : true
 },
 tokens: [{
     token : {
@@ -78,7 +115,6 @@ userSchema.methods.toJSON = function(){
     const userObject = user.toObject()
     delete userObject.password
     delete userObject.tokens
-    delete userObject.avatar
     return userObject
 
 }
@@ -98,10 +134,10 @@ userSchema.methods.generateAuthtoken = async function(){
 userSchema.statics.findByCredentials = async (email,password)=>{
     const user = await User.findOne({email})
     if (!user){
-        throw new Error('unable to login') }
+        throw new Error('email not recognized') }
     const isMatch = await bcrypt.compare(password,user.password)
     if(!isMatch) {
-        throw new Error('unable to login')
+        throw new Error('wrong password')
     }
     return user
 }

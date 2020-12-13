@@ -8,16 +8,17 @@ const router = new express.Router()
 
 // add admin
 router.post('/users', async (req,res)=>{
-    if(req.body.role!=="admin"){
-        return res.send({error:"invalid operation"})
-    }
+    // if(req.body.role!=="admin"){
+    //     return res.send({error:"invalid operation"})
+    // }
     const user = new User(req.body)
     try {
         await user.save()
         const token = await user.generateAuthtoken()
         res.status(201).send({user,token})
     } catch (e){
-        res.status(400).send(e)
+        res.status(400).send(e.message)
+        console.log(e.message)
     }
 
 })
@@ -76,11 +77,16 @@ router.post('/users/login', async (req,res)=>{
     try{
         const user = await User.findByCredentials(req.body.email,req.body.password)
         const token = await user.generateAuthtoken()
+        if(!user.isactive){
+            return res.send({error:"compte desactive"})
+        }
         res.send({user,token})
         
+        
     } catch(e){
-        res.status(400).send(e)
         console.log(e)
+        res.status(401).send(e)
+       
     }
 
 })
@@ -98,16 +104,27 @@ router.patch('/users/me',auth, async(req,res)=>{
     if(req.user.role==="guest"){
         return res.status(401).send({error:"invalid operation"})
     }
-    const updates = Object.keys(req.body)
-    const validUpdates = ['name','email','password']
-    const isValidUpdate = updates.every((update)=>validUpdates.includes(update))
-    if(!isValidUpdate){
-        return res.status(400).send({error:'invalid updates'})
-    }
+    const updates = Object.keys(req.body.updates)
+    // const validUpdates = ['firstname','email','password','lastname','language',
+    // 'timeZone','acboats','addboat','avatar']
+    // const isValidUpdate = updates.every((update)=>validUpdates.includes(update))
+    // if(!isValidUpdate){
+    //     console.log('not conforme')
+    //     return res.status(400).send({error:'invalid updates'})
+    // } 
+      
     try{
-        updates.forEach((update)=> req.user[update]= req.body[update])
+     //const updateduser=req.body
+      updates.forEach((update)=> req.user[update]= req.body.updates[update])
+      // const user =Object.assign(req.user,req.body.user)
+
+         //req.user = Object.assign(req.user,req.body)
+        
         await req.user.save()
-        const journale= new Journale({suser:req.suser,user:req.user._id,actionId:req.user._id,action:'modification user'})
+        console.log(req.body)
+
+        const journale= new Journale({suser:req.suser,user:req.user._id,
+            actionId:req.user._id,action:'modification user'})
         await journale.save()
         res.send(req.user)
 
@@ -136,6 +153,18 @@ router.post('/users/logoutAll', auth, async (req,res)=>{
     req.user.tokens= []
     await req.user.save()
     res.send('logged out')
+ } catch(e){
+     res.status(400).send(e)
+ }
+})
+//logout all device but me 
+router.post('/users/logoutAllLetme', auth, async (req,res)=>{
+    try{
+        req.user.tokens = req.user.tokens.filter((token)=>{
+            return token.token === req.token
+        })
+    await req.user.save()
+    res.send()
  } catch(e){
      res.status(400).send(e)
  }
@@ -246,48 +275,6 @@ router.patch('/users/:idu',auth,async(req,res)=>{
     }
 })
 
-// multer middleware for image avatar
-const uploadavatar = multer({
-    limits:{
-        fieldSize:10000000
-    },
-    fileFilter(req,file,cb){
-    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
-        return cb(new Error('please upload an image'))
-    }
-    cb(undefined,true)
-    }
-})
 
-//adding and changing image to the user
-router.post('/users/me/avatar', auth, uploadavatar.single('avatar') ,async(req,res)=>{
-    const buffer = await sharp(req.file.buffer).png().resize({width:250,height:250}).toBuffer() 
-    req.user.avatar = buffer
-    await req.user.save()
-    res.send()
-},(error,req,res,next)=>{
- res.status(400).send({error:error.message})
-})
-
-// deleting image from the user profile
-router.delete('/users/me/avatar',auth ,async(req,res)=>{
- req.user.avatar = undefined
- await req.user.save()
- res.send()
-})
-
-// fetching the user image 
-router.get('/users/:idu/avatar', auth, async(req,res)=>{
-    try{
-     const user = await User.findById(req.params.idu)
-      if (!user || !user.avatar){
-          throw new Error({error:'not found'})
-      }
-      res.set('Content-Type','image/png')
-      res.send(user.avatar)
-    } catch(e){
-    res.status(404).send()
-    }
-})
 
 module.exports = router
